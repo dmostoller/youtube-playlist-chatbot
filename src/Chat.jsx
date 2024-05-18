@@ -1,12 +1,9 @@
 import React, { useState } from "react";
 import Message from "./Message";
-// import Svg from "../components/Svg";
 import "./Chat.css";
 import { useFormik } from "formik";
 import * as yup from "yup";
 import robot from "./assets/robot-svgrepo-com.svg"
-
-
 
 function Chat() {
   // this function opens the chat
@@ -54,7 +51,7 @@ function Chat() {
     onSubmit: (values) => {
     // console.log(values)
     setLoading(true)
-    fetch("http://127.0.0.1:5000/ask_ai", {
+    fetch("/ask_ai", {
       method: "POST",
       headers: {
         "Content-Type": "application/json", // Set the content type to JSON

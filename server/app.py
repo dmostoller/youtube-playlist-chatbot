@@ -1,7 +1,6 @@
 from flask import Flask, request, jsonify, make_response
 from flask_cors import CORS
 import os
-import json
 import openai
 from youtube_transcript_api import YouTubeTranscriptApi
 from googleapiclient.discovery import build
@@ -37,7 +36,7 @@ def query_index():
         form_json = request.get_json()
         prompt = form_json["prompt"]
 
-        # Either way we can now query the index
+        # now query the index
         chat_engine = index.as_chat_engine(chat_mode="condense_question", verbose=True)
         response = chat_engine.chat(prompt)  # chat here
 
@@ -45,7 +44,6 @@ def query_index():
 
     except Exception as e:
         return jsonify({'error':  f"An error occurred: {e}"})
-
 
 
 @app.route("/")
