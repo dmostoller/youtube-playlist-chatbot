@@ -4,6 +4,7 @@ import Message from "./Message";
 import "./Chat.css";
 import { useFormik } from "formik";
 import * as yup from "yup";
+import robot from "./assets/robot-svgrepo-com.svg"
 
 
 
@@ -93,8 +94,8 @@ function Chat() {
         <div id="assistant-chat" className="hide ai_chart">
           <div className="header-chat">
             <div className="head-home">
-                <h2>TutorBot</h2>
-                <p>Online</p>
+                <img className="robot-avatar" src={robot} alt="robot"></img>
+                <span><h2>TutorBot</h2></span>
             </div>
           </div>
 
@@ -137,7 +138,7 @@ function Chat() {
           </div>
 
           <button 
-          className="ui inverted violet icon button" 
+          className="ui inverted circular basic violet icon button" 
           style={{position: "absolute", top: "10px", right: "7px"}}
           href="#close" onClick={closeChart}>
             <i className="close icon"></i>
@@ -145,13 +146,12 @@ function Chat() {
         </div>
         <button
           onClick={openChart}
-          className="ui circular huge violet button"
+          className="ui circular icon huge violet button"
           style={{position: "fixed", right: "20px", bottom: "20px"}}
           href="#load_chart"
           title="Show Chat"
         >
-          {/* <Svg /> */}
-          Production Questions? Ask Me!
+              Production Questions? Ask Me!
         </button>
       </div>
     </div>

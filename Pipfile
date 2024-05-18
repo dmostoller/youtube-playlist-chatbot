@@ -7,6 +7,10 @@ name = "pypi"
 flask = "*"
 flask-cors = "*"
 llama-index = "*"
+youtube-transcript-api = "*"
+google-api-python-client = "*"
+openai = "*"
+
 
 [requires]
 python_full_version = "3.8.13"
