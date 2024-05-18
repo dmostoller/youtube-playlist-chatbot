@@ -15,8 +15,19 @@ This is a simple chatbot that can answer questions about the content of videos i
 - yup
 - semantic-ui
 
+You will need to get API Keys for both Youtube and OpenAI. 
 
-If you want to check out the documentation for the libraries used yuou can find them here:
+For youtube, go to https://console.cloud.google.com/apis/ and click "ENable APIS and Services", search for Youtube API, and then click enable. 
+Then you will be able to create an API key to use with your googleapiclient.
+
+For OpenAI go to https://platform.openai.com/docs/api-reference/introduction and follow the instructions and create an account if you need to. 
+Then you will be able to create a project and secret key for it here:
+https://platform.openai.com/api-keys
+
+You can see the usage patterns for LLamaIndex's Chat Engine - Condense Question mode here, as well as documentation on other modes and usages:
+https://docs.llamaindex.ai/en/stable/examples/chat_engine/chat_engine_condense_question/
+
+If you want to check out the documentation for the libraries used you can find them here:
 
 https://pypi.org/project/openai/
 https://pypi.org/project/youtube-transcript-api/
