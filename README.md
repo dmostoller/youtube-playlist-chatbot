@@ -7,7 +7,7 @@ This is a simple chatbot that can answer questions about the content of videos i
 - react
 - vite
 - flask
-- openAi
+- openai
 - llama-index
 - youtube-transcript-api
 - google-api-python-client
@@ -17,7 +17,7 @@ This is a simple chatbot that can answer questions about the content of videos i
 
 You will need to get API Keys for both Youtube and OpenAI. 
 
-For youtube, go to https://console.cloud.google.com/apis/ and click "ENable APIS and Services", search for Youtube API, and then click enable. 
+For Youtube, go to https://console.cloud.google.com/apis/ and click "Enable APIS and Services", search for Youtube API, and then click enable. 
 Then you will be able to create an API key to use with your googleapiclient.
 
 For OpenAI go to https://platform.openai.com/docs/api-reference/introduction and follow the instructions and create an account if you need to. 
