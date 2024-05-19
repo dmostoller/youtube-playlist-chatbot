@@ -10,6 +10,7 @@ llama-index = "*"
 youtube-transcript-api = "*"
 google-api-python-client = "*"
 openai = "*"
+gunicorn = "*"
 
 
 [requires]
