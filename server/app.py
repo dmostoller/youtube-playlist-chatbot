@@ -11,8 +11,8 @@ openai.api_key = os.getenv('OPENAI_API_KEY')
 app = Flask(
     __name__,
     static_url_path="",
-    static_folder="../build",
-    template_folder="../build",    
+    static_folder="../dist",
+    template_folder="../dist",    
 )
 
 CORS(app)
