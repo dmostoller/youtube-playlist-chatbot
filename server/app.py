@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify, make_response
+from flask import Flask, request, jsonify, make_response, render_template
 from flask_cors import CORS
 import os
 import openai
@@ -7,8 +7,22 @@ from googleapiclient.discovery import build
 
 
 openai.api_key = os.getenv('OPENAI_API_KEY')
-app = Flask(__name__)
+
+app = Flask(
+    __name__,
+    static_url_path="",
+    static_folder="../build",
+    template_folder="../build",    
+)
+
 CORS(app)
+
+@app.route("/", defaults={'path': ''})
+@app.route("/<string:path>")
+@app.route("/<path:path>")
+def index(path):
+    return render_template("index.html")
+
 
 def query_index():
     # retrive open ai key
@@ -45,10 +59,6 @@ def query_index():
     except Exception as e:
         return jsonify({'error':  f"An error occurred: {e}"})
 
-
-@app.route("/")
-def index():
-    return "<h1>Project Server</h1>"
 
 
 @app.route('/ask_ai', methods=['POST'])
