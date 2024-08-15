@@ -16,7 +16,7 @@ app = Flask(
     template_folder="../dist",    
 )
 
-CORS(app, resources={r"/*": {"origins": "http://localhost:5173"}})
+CORS(app)
 
 @app.route("/", defaults={'path': ''})
 @app.route("/<string:path>")
@@ -34,12 +34,12 @@ def query_index():
             StorageContext,
             load_index_from_storage,
         )
-        from llama_index.llms.openai import OpenAI
-        llm = OpenAI(model="gpt-3.5-turbo")
+        # from llama_index.llms.openai import OpenAI
+        # llm = OpenAI(model="gpt-3.5-turbo")
 
-        from llama_index.core.memory import ChatMemoryBuffer
+        # from llama_index.core.memory import ChatMemoryBuffer
 
-        memory = ChatMemoryBuffer.from_defaults(token_limit=3900)
+        # memory = ChatMemoryBuffer.from_defaults(token_limit=3900)
 
 
         form_json = request.get_json()
@@ -65,20 +65,20 @@ def query_index():
             index = load_index_from_storage(storage_context)
 
 
-        chat_engine = index.as_chat_engine(
-            chat_mode="condense_plus_context",
-            memory=memory,
-            llm=llm,
-            context_prompt=(
-                "You are a chatbot, able to have normal interactions, as well as talk"
-                " about the content of the context."
-                "Here are the relevant documents for the context:\n"
-                "{context_str}"
-                "\nInstruction: Use the previous chat history, or the context above, to interact and help the user."
-            ),
-            verbose=False,
-        )
-        # chat_engine = index.as_chat_engine(chat_mode="condense_question", verbose=True)
+        # chat_engine = index.as_chat_engine(
+        #     chat_mode="condense_plus_context",
+        #     memory=memory,
+        #     llm=llm,
+        #     context_prompt=(
+        #         "You are a chatbot, able to have normal interactions, as well as talk"
+        #         " about the content of the context."
+        #         "Here are the relevant documents for the context:\n"
+        #         "{context_str}"
+        #         "\nInstruction: Use the previous chat history, or the context above, to interact and help the user."
+        #     ),
+        #     verbose=False,
+        # )
+        chat_engine = index.as_chat_engine(chat_mode="condense_question", verbose=True)
 
 
         response = chat_engine.chat(prompt)
