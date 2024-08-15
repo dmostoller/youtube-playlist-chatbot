@@ -1,10 +1,12 @@
 import { useState } from "react";
 import "./App.css";
 import "semantic-ui-css/semantic.min.css";
-import Chat from "./Chat";
-import Search from "./Search";
-import YoutubeEmbed from "./YoutubeEmbed";
+import Chat from "./components/Chat";
+import Search from "./components/Search";
+import YoutubeEmbed from "./components/YoutubeEmbed";
 import robot from "./assets/robot-svgrepo-com.svg";
+import Favicon from "react-favicon";
+
 
 function App() {
   const [videoId, setVideoId] = useState("");
@@ -13,6 +15,7 @@ function App() {
     <div
       className="ui inverted fluid basic segment"
       style={{ minWidth: "100vw", minHeight: "100vh" }}>
+      <Favicon url={robot} />
       <div className="ui container" style={{ marginTop: "50px" }}>
         <div className="ui middle aligned center aligned grid">
           <div className="column">
@@ -24,23 +27,23 @@ function App() {
                 <YoutubeEmbed embedId={videoId} />
                 <button
                   style={{ margin: "25px" }}
-                  className="ui massive inverted circular primary button"
+                  className="ui huge inverted circular blue button"
                   onClick={() => setVideoId("")}>
                   Select Another Video
                 </button>
               </div>
             ) : (
               <>
-                <img
-                  style={{ marginTop: "150px" }}
-                  className="ui centered tiny image"
-                  src={robot}
-                  alt="robot"></img>
+                <div className="ui container" style={{ marginTop: "125px" }}>
+                <img className="ui centered tiny image"src={robot} alt="robot"></img>
+                <h1 className="ui center aligned inverted icon header" style={{color: "#00bbff", marginBottom: "0px", marginTop: "10px"}}>
+                  Youtube Video Assistant</h1>
                 <Search onSetVideoId={setVideoId} />
+                </div>
               </>
             )}
             <div style={{ position: "relative", height: "500px" }}>
-              <Chat />
+              <Chat videoId={videoId}/>
             </div>
           </div>
         </div>

@@ -24,9 +24,10 @@ a:hover {
 
 .input-field {
     background-color: transparent;
-    border: 2px solid rgb(0, 200, 255);
+    border: 2px solid #00c8ff;
     border-radius: 5px;
     padding: 10px;
+    text-decoration-color: #ffffff;
 }
 
 h1 {

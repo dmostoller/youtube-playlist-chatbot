@@ -3,9 +3,9 @@ import Message from "./Message";
 import "./Chat.css";
 import { useFormik } from "formik";
 import * as yup from "yup";
-import robot from "./assets/robot-svgrepo-com.svg";
+import robot from "../assets/robot-svgrepo-com.svg";
 
-function Chat() {
+function Chat({ videoId }) {
   const [isOpen, setIsOpen] = useState(false);
   // this function opens the chat
   function openChat() {
@@ -13,7 +13,7 @@ function Chat() {
     document.getElementById("assistant-chat").classList.remove("hide");
     setIsOpen(true);
   }
-
+// console.log(videoId)
   // this function opens the chat
   function closeChat() {
     document.getElementById("assistant-chat").classList.add("hide");
@@ -50,8 +50,11 @@ function Chat() {
   });
 
   const formik = useFormik({
+    enableReinitialize: true,
     initialValues: {
       prompt: "",
+      video_id: `${videoId}`,
+
     },
     validationSchema: formSchema,
     onSubmit: (values) => {
@@ -64,9 +67,7 @@ function Chat() {
         },
         body: JSON.stringify(values),
       }).then((res) => {
-        res
-          .json()
-          .then((resData) => {
+        res.json().then((resData) => {
             // console.log(resData)
             const messages = [
               ...chatMessages,
@@ -155,7 +156,7 @@ function Chat() {
         {isOpen ? null : (
           <button
             onClick={openChat}
-            className="ui circular icon massive blue button"
+            className="ui circular icon inverted massive blue button"
             style={{ position: "fixed", right: "20px", bottom: "20px" }}
             href="#load_chart"
             title="Show Chat">

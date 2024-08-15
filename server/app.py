@@ -5,7 +5,7 @@ import os
 import openai
 from youtube_transcript_api import YouTubeTranscriptApi
 from googleapiclient.discovery import build
-
+import logging
 
 openai.api_key = os.getenv('OPENAI_API_KEY')
 
@@ -16,7 +16,7 @@ app = Flask(
     template_folder="../dist",    
 )
 
-CORS(app)
+CORS(app, resources={r"/*": {"origins": "http://localhost:5173"}})
 
 @app.route("/", defaults={'path': ''})
 @app.route("/<string:path>")
@@ -24,8 +24,9 @@ CORS(app)
 def index(path):
     return render_template("index.html")
 
+
+@app.route('/ask_ai', methods=['POST'])
 def query_index():
-    # retrive open ai key
     try:
         from llama_index.core import (
             VectorStoreIndex,
@@ -33,38 +34,62 @@ def query_index():
             StorageContext,
             load_index_from_storage,
         )
+        from llama_index.llms.openai import OpenAI
+        llm = OpenAI(model="gpt-3.5-turbo")
 
-        # check if storage already exists
-        PERSIST_DIR = "./storage"
-        if not os.path.exists(PERSIST_DIR):
-            # load the documents and create the index
-            documents = SimpleDirectoryReader("data").load_data()
-            index = VectorStoreIndex.from_documents(documents)
-            # store it for later
-            index.storage_context.persist(persist_dir=PERSIST_DIR)
-        else:
-            # load the existing index
-            storage_context = StorageContext.from_defaults(persist_dir=PERSIST_DIR)
-            index = load_index_from_storage(storage_context)
+        from llama_index.core.memory import ChatMemoryBuffer
+
+        memory = ChatMemoryBuffer.from_defaults(token_limit=3900)
+
 
         form_json = request.get_json()
+        video_id = form_json["video_id"]
         prompt = form_json["prompt"]
 
-        # now query the index
-        chat_engine = index.as_chat_engine(chat_mode="condense_plus_context", verbose=True)
-        response = chat_engine.chat(prompt)  # chat here
+        if not video_id or not prompt:
+            return jsonify({'error': 'Missing video_id or prompt in request'}), 400
 
+        storage_path = f"./storage/{video_id}"
+        data_path = f"data/{video_id}"
+
+        if not os.path.exists(storage_path):
+            if not os.path.exists(data_path):
+                return jsonify({'error': f'Data path {data_path} does not exist'}), 400
+
+            storage_context = StorageContext.from_defaults()
+            documents = SimpleDirectoryReader(data_path).load_data()
+            index = VectorStoreIndex.from_documents(documents, storage_context=storage_context)
+            index.storage_context.persist(persist_dir=storage_path)
+        else:
+            storage_context = StorageContext.from_defaults(persist_dir=storage_path)
+            index = load_index_from_storage(storage_context)
+
+
+        chat_engine = index.as_chat_engine(
+            chat_mode="condense_plus_context",
+            memory=memory,
+            llm=llm,
+            context_prompt=(
+                "You are a chatbot, able to have normal interactions, as well as talk"
+                " about the content of the context."
+                "Here are the relevant documents for the context:\n"
+                "{context_str}"
+                "\nInstruction: Use the previous chat history, or the context above, to interact and help the user."
+            ),
+            verbose=False,
+        )
+        # chat_engine = index.as_chat_engine(chat_mode="condense_question", verbose=True)
+
+
+        response = chat_engine.chat(prompt)
         return jsonify({'result' : f"{response}"})
-
+    
     except Exception as e:
-        return jsonify({'error':  f"An error occurred: {e}"})
+        logging.error(f"An error occurred: {e}")
+        return jsonify({'error': f"An error occurred: {e}"}), 500
 
 
 
-@app.route('/ask_ai', methods=['POST'])
-def query_endpoint():
-    response = query_index()
-    return response
 
 
 
@@ -74,7 +99,7 @@ def create_transcripts():
     url = form_json["video_id"]
     video_id = extract_video_id(url)
 
-    save_transcripts_to_files(os.getenv('YOUTUBE_API_KEY'), video_id, "data")
+    save_transcripts_to_files(os.getenv('YOUTUBE_API_KEY'), video_id, "data/" + video_id)
     
     response = jsonify({'result' : video_id})
     return response

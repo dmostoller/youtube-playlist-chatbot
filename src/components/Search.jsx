@@ -30,7 +30,7 @@ function Search({ onSetVideoId}) {
           body: JSON.stringify(values),
         }).then((res) => {
             res.json().then((resData) => {
-            console.log(resData)
+            // console.log(resData)
             onSetVideoId(resData.result)
             formik.resetForm()
             setLoading(false)
@@ -56,19 +56,20 @@ function Search({ onSetVideoId}) {
                     <input 
                     type='text' 
                     className="input-field"
+                    style={{color: 'white'}}
                     placeholder='copy/paste a YouTube video URL here to begin.....' 
                     name="video_id"
                     value={formik.values.video_id}
                     onChange={formik.handleChange}
                     />
-                    { loading ? <div className="ui massive inverted primary loading button"></div> 
+                    { loading ? <div style={{padding: "18px"}} className="ui massive secondary blue loading button"></div> 
                     :
                     <div
                         href="#"
                         type="submit"
                         className="ui massive red icon"
                         >
-                        <i className="blue inverted send link icon"></i>
+                        <i onClick={formik.handleSubmit} className="blue inverted level down link icon"></i>
                     </div>
                     }
                 </div>
