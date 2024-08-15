@@ -1,4 +1,4 @@
-# TutorBot
+# TutorBot: Contextual Video Chatbot Assistant
 
 This is a simple chatbot that can answer questions about the content of videos in a youtube playlist. I created it to be an online assistant for my music tutorial videos, but it would work for any youtube video content. 
 

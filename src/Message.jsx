@@ -8,7 +8,6 @@ function Message(props) {
     <div data-role={dataRoll} className="bubble-container">
       <div className={thisClass}>
         <div className="ui large message">
-          {/* {props.message.replace(/<\/?[^>]+(>|$)/g, "")} */}
           {props.message}
         </div>
       </div>

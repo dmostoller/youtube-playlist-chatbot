@@ -8,7 +8,9 @@ from googleapiclient.discovery import build
 
 openai.api_key = os.getenv('OPENAI_API_KEY')
 app = Flask(__name__)
-CORS(app)
+CORS(app, resources={r"/*": {"origins": "http://localhost:5173"}})
+
+
 
 def query_index():
     # retrive open ai key
@@ -37,10 +39,13 @@ def query_index():
         prompt = form_json["prompt"]
 
         # now query the index
-        chat_engine = index.as_chat_engine(chat_mode="condense_question", verbose=True)
+        chat_engine = index.as_chat_engine(chat_mode="condense_plus_context", verbose=True)
         response = chat_engine.chat(prompt)  # chat here
 
         return jsonify({'result' : f"{response}"})
+
+    except Exception as e:
+        return jsonify({'error':  f"An error occurred: {e}"})
 
     except Exception as e:
         return jsonify({'error':  f"An error occurred: {e}"})
@@ -55,6 +60,14 @@ def index():
 def query_endpoint():
     response = query_index()
     return response
+
+@app.route('/create_transcripts', methods=['POST'])
+def create_transcripts():
+    form_json = request.get_json()
+    playlist_id = form_json["youtube_playlist_id"]
+    save_transcripts_to_files(os.getenv('YOUTUBE_API_KEY'), playlist_id, "data")
+    
+    return jsonify({'result' : f"Transcripts created successfully for playlist_id: {playlist_id}"})
 
 
 def save_transcripts_to_files(api_key, playlist_id, output_dir):
@@ -111,11 +124,11 @@ def save_transcripts_to_files(api_key, playlist_id, output_dir):
         except Exception as e:
             print(f"Error fetching transcript for video ID {video_id} ({video_title}): {str(e)}")
 
-youtube_api_key = os.getenv('YOUTUBE_API_KEY')
-playlist_id = "PLkiLSmC1caWur5fzZycc6Sh65tYb3OKhS"
-output_dir = "data"
+# youtube_api_key = os.getenv('YOUTUBE_API_KEY')
+# playlist_id = "PLkiLSmC1caWur5fzZycc6Sh65tYb3OKhS"
+# output_dir = "data"
 
-save_transcripts_to_files(youtube_api_key, playlist_id, output_dir)
+# save_transcripts_to_files(youtube_api_key, playlist_id, output_dir)
 
 
 

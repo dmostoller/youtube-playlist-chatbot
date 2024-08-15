@@ -6,16 +6,19 @@ import * as yup from "yup";
 import robot from "./assets/robot-svgrepo-com.svg"
 
 function Chat() {
+  const [isOpen, setIsOpen] = useState(false);
   // this function opens the chat
-  function openChart() {
+  function openChat() {
     document.getElementById("assistant-chat").classList.add("show");
     document.getElementById("assistant-chat").classList.remove("hide");
+    setIsOpen(true);
   }
 
   // this function opens the chat
-  function closeChart() {
+  function closeChat() {
     document.getElementById("assistant-chat").classList.add("hide");
     document.getElementById("assistant-chat").classList.remove("show");
+    setIsOpen(false);
   }
 
   function chat_scroll_up() {
@@ -35,7 +38,7 @@ function Chat() {
   const [chatMessages, setchatMessages] = useState([
     {
       position: "left_bubble",
-      message: "Hello there, my name is TutorBot. I'm here to help you understand Kabayun's production tutorials. Do you have any questions for me? Remember, I'm not a real person so please make your questions as detailed as possible.",
+      message: "Hello there, my name is TutorBot. I'm here to answer queries based on the videos from your chosen playlist. How can I help you?",
     },
   ]);
 
@@ -51,7 +54,7 @@ function Chat() {
     onSubmit: (values) => {
     // console.log(values)
     setLoading(true)
-    fetch("/ask_ai", {
+    fetch("http://127.0.0.1:5000/ask_ai", {
       method: "POST",
       headers: {
         "Content-Type": "application/json", // Set the content type to JSON
@@ -135,21 +138,24 @@ function Chat() {
           </div>
 
           <button 
-          className="ui inverted circular basic violet icon button" 
+          className="ui inverted circular basic icon button" 
           style={{position: "absolute", top: "10px", right: "7px"}}
-          href="#close" onClick={closeChart}>
+          href="#close" onClick={closeChat}>
             <i className="close icon"></i>
           </button>
         </div>
+          { isOpen ? null : (
         <button
-          onClick={openChart}
-          className="ui circular icon huge violet button"
+          onClick={openChat}
+          className="ui circular icon huge primary button"
           style={{position: "fixed", right: "20px", bottom: "20px"}}
           href="#load_chart"
           title="Show Chat"
         >
-              Production Questions? Ask Me!
+              Open Chat Window
         </button>
+)}
+      
       </div>
     </div>
   );
