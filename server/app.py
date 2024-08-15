@@ -6,7 +6,6 @@ import openai
 from youtube_transcript_api import YouTubeTranscriptApi, TranscriptsDisabled
 from googleapiclient.discovery import build
 import logging
-import requests
 
 
 
@@ -20,6 +19,15 @@ openai.api_key = os.getenv('OPENAI_API_KEY')
 #     'x-rapidapi-key': rapid_api_key,
 #     'x-rapidapi-host': "youtube-media-downloader.p.rapidapi.com"
 # }
+
+import requests
+url = 'https://youtube-playlist-chatbot.onrender.com/'
+proxies = {
+  "http":'socks5://99.56.147.242',
+  "https":'socks5://99.56.147.242'
+}
+response = requests.get(url,proxies=proxies)
+
 
 app = Flask(
     __name__,
@@ -171,7 +179,7 @@ def save_transcripts_to_files(api_key, video_id, output_dir):
             return
 
         # Get the transcript
-        transcript = YouTubeTranscriptApi.get_transcript(video_id, proxies={"https": "socks5h://localhost:8080"})
+        transcript = YouTubeTranscriptApi.get_transcript(video_id, proxies={proxies})
 
         with open(filename, "w") as file:
             # Write each transcript entry to the file
