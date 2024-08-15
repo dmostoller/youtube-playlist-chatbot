@@ -3,7 +3,7 @@ from flask_cors import CORS
 import re
 import os
 import openai
-from youtube_transcript_api import YouTubeTranscriptApi
+from youtube_transcript_api import YouTubeTranscriptApi, TranscriptsDisabled
 from googleapiclient.discovery import build
 import logging
 
@@ -80,8 +80,8 @@ def query_index():
         # )
         chat_engine = index.as_chat_engine(chat_mode="condense_question", verbose=True)
 
-
         response = chat_engine.chat(prompt)
+
         return jsonify({'result' : f"{response}"})
     
     except Exception as e:
@@ -99,9 +99,20 @@ def create_transcripts():
     url = form_json["video_id"]
     video_id = extract_video_id(url)
 
-    save_transcripts_to_files(os.getenv('YOUTUBE_API_KEY'), video_id, "data/" + video_id)
+    # save_transcripts_to_files(os.getenv('YOUTUBE_API_KEY'), video_id, "data/" + video_id)
+
     
+    try:
+        save_transcripts_to_files(os.getenv('YOUTUBE_API_KEY'), video_id, "data/" + video_id)
+        response = jsonify({'result': video_id})
+    except TranscriptsDisabled:
+        logging.error(f"Subtitles are disabled for video ID {video_id}")
+        response = jsonify({'error': 'Subtitles are disabled for this video'}), 400
+    except Exception as e:
+        logging.error(f"An error occurred: {e}")
+        response = jsonify({'error': f"An error occurred: {e}"}), 500
     response = jsonify({'result' : video_id})
+    
     return response
 
 
@@ -129,7 +140,6 @@ def save_transcripts_to_files(api_key, video_id, output_dir):
         return
 
     video_title = response["items"][0]["snippet"]["title"]
-    video_date = response["items"][0]["snippet"]["publishedAt"]
 
     # Create the output directory if it doesn't exist
     if not os.path.exists(output_dir):
@@ -144,7 +154,8 @@ def save_transcripts_to_files(api_key, video_id, output_dir):
             return
 
         # Get the transcript
-        transcript = YouTubeTranscriptApi.get_transcript(video_id)
+        transcript = YouTubeTranscriptApi.get_transcript(video_id, proxies={"https": "http://localhost:8080"})
+
         with open(filename, "w") as file:
             # Write each transcript entry to the file
             for entry in transcript:
