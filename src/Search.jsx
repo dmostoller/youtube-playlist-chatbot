@@ -3,7 +3,7 @@ import { useFormik } from "formik";
 import * as yup from "yup";
 
 
-function Search({ setVideoId}) {
+function Search({ onSetVideoId}) {
     const [loading, setLoading] = useState(false)
 
     function toggleLoading() {
@@ -11,7 +11,7 @@ function Search({ setVideoId}) {
     }
 
     const formSchema = yup.object().shape({
-        video_id: yup.string().required("Please enter a valid youtube Video Id."),
+        video_id: yup.string().required("Please enter a valid Youtube video URL."),
       })
     
       const formik = useFormik({
@@ -31,7 +31,7 @@ function Search({ setVideoId}) {
         }).then((res) => {
             res.json().then((resData) => {
             console.log(resData)
-            setVideoId(resData.result)
+            onSetVideoId(resData.result)
             formik.resetForm()
             setLoading(false)
           })
@@ -48,23 +48,23 @@ function Search({ setVideoId}) {
     <div className="ui centered grid">
         <div className="row">
           <div className="column">
-            <div className="ui center aligned segment">
-              <h2>Enter a Youtube Video ID:</h2>
-              <form onSubmit={formik.handleSubmit}>
-                <div className='ui huge action input fluid'>
+            <div className="ui center aligned inverted padded segment">
+              <div className="ui text container">
+              <form className="ui form" onSubmit={formik.handleSubmit}>
+                <div className='ui massive transparent fluid action input'>
                     <input 
                     type='text' 
-                    placeholder='Youtube Video ID...' 
+                    placeholder='copy/paste a YouTube video URL here to begin.....' 
                     name="video_id"
                     value={formik.values.video_id}
                     onChange={formik.handleChange}
                     />
-                    { loading ? <div className="ui huge loading button"></div> 
+                    { loading ? <div className="ui massive loading button"></div> 
                     :
                     <button
                         href="#"
                         type="submit"
-                        className="ui huge primary icon button"
+                        className="ui massive primary inverted icon button"
                         >
                         <i className="send icon"></i>
                     </button>
@@ -72,6 +72,7 @@ function Search({ setVideoId}) {
                 </div>
               </form>
               {formik.errors && <p style={{color:'red', textAlign:'center'}}>{formik.errors.video_id}</p>}
+            </div>
             </div>
           </div>
         </div>

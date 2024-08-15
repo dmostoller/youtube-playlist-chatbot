@@ -1,5 +1,6 @@
 from flask import Flask, request, jsonify, make_response
 from flask_cors import CORS
+import re
 import os
 import openai
 from youtube_transcript_api import YouTubeTranscriptApi
@@ -57,15 +58,26 @@ def query_endpoint():
     response = query_index()
     return response
 
+
+
 @app.route('/create_transcripts', methods=['POST'])
 def create_transcripts():
     form_json = request.get_json()
-    video_id = form_json["video_id"]
-    
+    url = form_json["video_id"]
+    video_id = extract_video_id(url)
+
     save_transcripts_to_files(os.getenv('YOUTUBE_API_KEY'), video_id, "data")
     
     response = jsonify({'result' : video_id})
     return response
+
+
+def extract_video_id(url):
+    regex = r'(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/(?:[^\/\n\s]+\/\S+\/|(?:v|e(?:mbed)?)\/|\S*?[?&]v=)|youtu\.be\/)([a-zA-Z0-9_-]{11})'
+    match = re.search(regex, url)
+    return match.group(1) if match else None
+
+
 
 def save_transcripts_to_files(api_key, video_id, output_dir):
     # Build the YouTube API client using the provided API key
