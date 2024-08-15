@@ -12,13 +12,14 @@ import http.client
 
 
 openai.api_key = os.getenv('OPENAI_API_KEY')
-rapid_api_key = os.getenv('RAPIDAPI_KEY')
-conn = http.client.HTTPSConnection("youtube-media-downloader.p.rapidapi.com")
 
-headers = {
-    'x-rapidapi-key': rapid_api_key,
-    'x-rapidapi-host': "youtube-media-downloader.p.rapidapi.com"
-}
+# rapid_api_key = os.getenv('RAPIDAPI_KEY')
+# conn = http.client.HTTPSConnection("youtube-media-downloader.p.rapidapi.com")
+
+# headers = {
+#     'x-rapidapi-key': rapid_api_key,
+#     'x-rapidapi-host': "youtube-media-downloader.p.rapidapi.com"
+# }
 
 app = Flask(
     __name__,
@@ -145,9 +146,9 @@ def save_transcripts_to_files(api_key, video_id, output_dir):
     )
     response = request.execute()
 
-    conn.request("GET", f"/v2/video/details?videoId={video_id}", headers=headers)
-    res = conn.getresponse()
-    data = res.read()
+    # conn.request("GET", f"/v2/video/details?videoId={video_id}", headers=headers)
+    # res = conn.getresponse()
+    # data = res.read()
 
 
     # Extract video details
