@@ -1,5 +1,6 @@
 from flask import Flask, request, jsonify, make_response, render_template
 from flask_cors import CORS
+import re
 import os
 import openai
 from youtube_transcript_api import YouTubeTranscriptApi
@@ -22,7 +23,6 @@ CORS(app)
 @app.route("/<path:path>")
 def index(path):
     return render_template("index.html")
-
 
 def query_index():
     # retrive open ai key
@@ -51,7 +51,7 @@ def query_index():
         prompt = form_json["prompt"]
 
         # now query the index
-        chat_engine = index.as_chat_engine(chat_mode="condense_question", verbose=True)
+        chat_engine = index.as_chat_engine(chat_mode="condense_plus_context", verbose=True)
         response = chat_engine.chat(prompt)  # chat here
 
         return jsonify({'result' : f"{response}"})
@@ -67,65 +67,73 @@ def query_endpoint():
     return response
 
 
-def save_transcripts_to_files(api_key, playlist_id, output_dir):
+
+@app.route('/create_transcripts', methods=['POST'])
+def create_transcripts():
+    form_json = request.get_json()
+    url = form_json["video_id"]
+    video_id = extract_video_id(url)
+
+    save_transcripts_to_files(os.getenv('YOUTUBE_API_KEY'), video_id, "data")
+    
+    response = jsonify({'result' : video_id})
+    return response
+
+
+def extract_video_id(url):
+    regex = r'(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/(?:[^\/\n\s]+\/\S+\/|(?:v|e(?:mbed)?)\/|\S*?[?&]v=)|youtu\.be\/)([a-zA-Z0-9_-]{11})'
+    match = re.search(regex, url)
+    return match.group(1) if match else None
+
+
+
+def save_transcripts_to_files(api_key, video_id, output_dir):
     # Build the YouTube API client using the provided API key
     youtube = build("youtube", "v3", developerKey=api_key)
 
-    # Get all the videos in the playlist, sorted by date
-    videos = []
-    next_page_token = None
-    while True:
-        request = youtube.playlistItems().list(
-            part="contentDetails,snippet",
-            playlistId=playlist_id,
-            maxResults=50,
-            pageToken=next_page_token
-        )
-        response = request.execute()
+    # Get the video details
+    request = youtube.videos().list(
+        part="snippet",
+        id=video_id
+    )
+    response = request.execute()
 
-        # Add each video to the list of videos
-        for item in response["items"]:
-            video_id = item["contentDetails"]["videoId"]
-            video_title = item["snippet"]["title"]
-            video_date = item["snippet"]["publishedAt"]
-            videos.append((video_id, video_title, video_date))
+    # Extract video details
+    if not response["items"]:
+        print(f"No video found with ID {video_id}")
+        return
 
-        # Check if there are more videos to fetch
-        next_page_token = response.get("nextPageToken")
-        if not next_page_token:
-            break
-
-    # Sort the videos by date, descending. Once we reach a file that already exists, we can stop
-    # This allows us to run the script again later and only fetch new videos
-    videos.sort(key=lambda x: x[2], reverse=True)
+    video_title = response["items"][0]["snippet"]["title"]
+    video_date = response["items"][0]["snippet"]["publishedAt"]
 
     # Create the output directory if it doesn't exist
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
 
-    # For each video, get the transcript and save it to a file if it doesn't already exist
-    for video_id, video_title, video_date in videos:
-        try:
-            # Remove any non-alphanumeric characters from the video title and use it as the filename
-            safe_title = "".join([c for c in video_title if c.isalnum() or c.isspace()]).rstrip()
-            filename = os.path.join(output_dir, f"{safe_title}.txt")
-            if os.path.exists(filename):
-                # If the file already exists, assume the rest are there too and stop
-                break
-            transcript = YouTubeTranscriptApi.get_transcript(video_id)
-            with open(filename, "w") as file:
-                # Write each transcript entry to the file
-                for entry in transcript:
-                    file.write(entry['text'] + ' ')
-            print(f"Transcript saved to {safe_title}.txt")
-        except Exception as e:
-            print(f"Error fetching transcript for video ID {video_id} ({video_title}): {str(e)}")
+    try:
+        # Remove any non-alphanumeric characters from the video title and use it as the filename
+        safe_title = "".join([c for c in video_title if c.isalnum() or c.isspace()]).rstrip()
+        filename = os.path.join(output_dir, f"{safe_title}.txt")
+        if os.path.exists(filename):
+            print(f"Transcript already exists for {safe_title}.txt")
+            return
 
-youtube_api_key = os.getenv('YOUTUBE_API_KEY')
-playlist_id = "PLkiLSmC1caWur5fzZycc6Sh65tYb3OKhS"
-output_dir = "data"
+        # Get the transcript
+        transcript = YouTubeTranscriptApi.get_transcript(video_id)
+        with open(filename, "w") as file:
+            # Write each transcript entry to the file
+            for entry in transcript:
+                file.write(entry['text'] + ' ')
+        print(f"Transcript saved to {safe_title}.txt")
+    except Exception as e:
+        print(f"Error fetching transcript for video ID {video_id} ({video_title}): {str(e)}")
 
-save_transcripts_to_files(youtube_api_key, playlist_id, output_dir)
+
+# youtube_api_key = os.getenv('YOUTUBE_API_KEY')
+# playlist_id = "PLkiLSmC1caWur5fzZycc6Sh65tYb3OKhS"
+# output_dir = "data"
+
+# save_transcripts_to_files(youtube_api_key, playlist_id, output_dir)
 
 
 

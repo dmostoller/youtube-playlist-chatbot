@@ -1,6 +1,6 @@
 /* my styles  */
 :root {
-    --chat-primary-bg: #6435C9;
+    --chat-primary-bg: #0E6EB8;
     --chat-primary-color: #fff;
     --chat-bubble-bg: #fff;
     --chat-bubble-color: rgba(0, 0, 0, .8);
@@ -84,7 +84,7 @@
     overflow: hidden;
     z-index: 10000000 !important;
     animation-name: showchat;
-    animation-duration: 1s;
+    animation-duration: 0.5s;
     transform: scale(1);
     background-color: #fff;
 }

@@ -1,4 +1,4 @@
-# TutorBot
+# TutorBot: Contextual Video Chatbot Assistant
 
 This is a simple chatbot that can answer questions about the content of videos in a youtube playlist. I created it to be an online assistant for my music tutorial videos, but it would work for any youtube video content. 
 
@@ -27,10 +27,15 @@ https://platform.openai.com/api-keys
 You can see the usage patterns for LLamaIndex's Chat Engine - Condense Question mode here, as well as documentation on other modes and usages:
 https://docs.llamaindex.ai/en/stable/examples/chat_engine/chat_engine_condense_question/
 
+Thanks to Daniel Crouthamel for his excellent Medium blog post which I used as the basis for this app.
+https://medium.com/@bSharpML/summarize-youtube-videos-with-llamaindex-part-2-baaac5a7d0cd
+
 If you want to check out the documentation for the libraries used you can find them here:
 
 https://pypi.org/project/openai/
 https://pypi.org/project/youtube-transcript-api/
+
+
 https://pypi.org/project/llama-index/
 https://pypi.org/project/google-api-python-client/
 https://react.semantic-ui.com/usage/

@@ -24,12 +24,8 @@ else:
     storage_context = StorageContext.from_defaults(persist_dir=PERSIST_DIR)
     index = load_index_from_storage(storage_context)
 
-# Either way we can now query the index
-# query_engine = index.as_query_engine()
-# response = query_engine.query("Where did David work?")
-# print(response)
 
 
 chat_engine = index.as_chat_engine(chat_mode="condense_question", verbose=True)
-response = chat_engine.chat("WHat is the capital of Iran?")
+response = chat_engine.chat("How do I make a bassline?")
 print(response)
