@@ -22,7 +22,7 @@ function Search({ onSetVideoId}) {
         onSubmit: (values) => {
         // console.log(values)
         setLoading(true)
-        fetch("http://127.0.0.1:5000/create_transcripts", {
+        fetch("/create_transcripts", {
           method: "POST",
           headers: {
             "Content-Type": "application/json", // Set the content type to JSON
@@ -51,24 +51,27 @@ function Search({ onSetVideoId}) {
             <div className="ui center aligned inverted padded segment">
               <div className="ui text container">
               <form className="ui form" onSubmit={formik.handleSubmit}>
+                <div className="input-field">
                 <div className='ui massive transparent fluid action input'>
                     <input 
                     type='text' 
+                    className="input-field"
                     placeholder='copy/paste a YouTube video URL here to begin.....' 
                     name="video_id"
                     value={formik.values.video_id}
                     onChange={formik.handleChange}
                     />
-                    { loading ? <div className="ui massive loading button"></div> 
+                    { loading ? <div className="ui massive inverted primary loading button"></div> 
                     :
-                    <button
+                    <div
                         href="#"
                         type="submit"
-                        className="ui massive primary inverted icon button"
+                        className="ui massive red icon"
                         >
-                        <i className="send icon"></i>
-                    </button>
+                        <i className="blue inverted send link icon"></i>
+                    </div>
                     }
+                </div>
                 </div>
               </form>
               {formik.errors && <p style={{color:'red', textAlign:'center'}}>{formik.errors.video_id}</p>}
