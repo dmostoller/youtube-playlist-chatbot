@@ -57,7 +57,7 @@ function Chat() {
     onSubmit: (values) => {
       // console.log(values)
       setLoading(true);
-      fetch("http://127.0.0.1:5000/ask_ai", {
+      fetch("/ask_ai", {
         method: "POST",
         headers: {
           "Content-Type": "application/json", // Set the content type to JSON
