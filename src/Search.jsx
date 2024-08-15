@@ -3,21 +3,20 @@ import { useFormik } from "formik";
 import * as yup from "yup";
 
 
-function Search() {
+function Search({ setVideoId}) {
     const [loading, setLoading] = useState(false)
-    const [playlistId, setPlaylistId] = useState('')
 
     function toggleLoading() {
       setLoading(!loading)
     }
 
     const formSchema = yup.object().shape({
-        youtube_playlist_id: yup.string().required("Please enter a valid youtube playlist Id."),
+        video_id: yup.string().required("Please enter a valid youtube Video Id."),
       })
     
       const formik = useFormik({
         initialValues: {
-            youtube_playlist_id: '',
+            video_id: '',
         },
         validationSchema: formSchema,
         onSubmit: (values) => {
@@ -32,7 +31,7 @@ function Search() {
         }).then((res) => {
             res.json().then((resData) => {
             console.log(resData)
-            setPlaylistId(resData.result)
+            setVideoId(resData.result)
             formik.resetForm()
             setLoading(false)
           })
@@ -49,24 +48,15 @@ function Search() {
     <div className="ui centered grid">
         <div className="row">
           <div className="column">
-        { playlistId ?
             <div className="ui center aligned segment">
-                <h3 style={{color: "green"}}>{playlistId}</h3>
-                <h3>Open the chat window below to ask questions about the videos in your playlist.</h3>
-                <button className="ui huge primary button" onClick={() => setPlaylistId('')}>Enter another playlist ID</button>
-            </div>
-            
-          :
-
-            <div className="ui center aligned segment">
-              <h2>Enter a Youtube Playlist ID:</h2>
+              <h2>Enter a Youtube Video ID:</h2>
               <form onSubmit={formik.handleSubmit}>
                 <div className='ui huge action input fluid'>
                     <input 
                     type='text' 
-                    placeholder='Youtube Playlist ID...' 
-                    name="youtube_playlist_id"
-                    value={formik.values.youtube_playlist_id}
+                    placeholder='Youtube Video ID...' 
+                    name="video_id"
+                    value={formik.values.video_id}
                     onChange={formik.handleChange}
                     />
                     { loading ? <div className="ui huge loading button"></div> 
@@ -81,10 +71,8 @@ function Search() {
                     }
                 </div>
               </form>
-              {formik.errors && <p style={{color:'red', textAlign:'center'}}>{formik.errors.youtube_playlist_id}</p>}
+              {formik.errors && <p style={{color:'red', textAlign:'center'}}>{formik.errors.video_id}</p>}
             </div>
-
-            }  
           </div>
         </div>
       </div>
