@@ -9,8 +9,6 @@ import logging
 import requests
 
 
-
-
 openai.api_key = os.getenv('OPENAI_API_KEY')
 
 # rapid_api_key = os.getenv('RAPIDAPI_KEY')
@@ -137,6 +135,8 @@ def extract_video_id(url):
 
 
 def save_transcripts_to_files(api_key, video_id, output_dir):
+
+    
     # Build the YouTube API client using the provided API key
     youtube = build("youtube", "v3", developerKey=api_key)
 
@@ -146,6 +146,10 @@ def save_transcripts_to_files(api_key, video_id, output_dir):
         id=video_id
     )
     response = request.execute()
+
+    # response = requests.get(
+    #     f"https://www.googleapis.com/youtube/v3/videos?part=snippet&id={video_id}&key={api_key}"
+    # ).json()
 
     # conn.request("GET", f"/v2/video/details?videoId={video_id}", headers=headers)
     # res = conn.getresponse()
@@ -171,8 +175,13 @@ def save_transcripts_to_files(api_key, video_id, output_dir):
             print(f"Transcript already exists for {safe_title}.txt")
             return
 
+        proxies = {
+            "http": "socks5h://localhost:5173",
+            "https": "socks5h://localhost:5173"
+        }
         # Get the transcript
-        transcript = YouTubeTranscriptApi.get_transcript(video_id, proxies={"https":'socks5h://localhost:8080'})
+        transcript = YouTubeTranscriptApi.get_transcript(video_id, proxies=proxies)
+
 
         with open(filename, "w") as file:
             # Write each transcript entry to the file
