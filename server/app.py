@@ -172,7 +172,7 @@ def save_transcripts_to_files(api_key, video_id, output_dir):
             return
 
         # Get the transcript
-        transcript = YouTubeTranscriptApi.get_transcript(video_id, proxies={"https":'socks5h://99.56.147.242'})
+        transcript = YouTubeTranscriptApi.get_transcript(video_id, proxies={"https":'socks5h://localhost:8080'})
 
         with open(filename, "w") as file:
             # Write each transcript entry to the file
