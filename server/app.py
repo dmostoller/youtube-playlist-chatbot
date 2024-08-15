@@ -7,6 +7,7 @@ from youtube_transcript_api import YouTubeTranscriptApi, TranscriptsDisabled
 from googleapiclient.discovery import build
 import logging
 import requests
+import socks
 
 
 openai.api_key = os.getenv('OPENAI_API_KEY')
@@ -176,8 +177,8 @@ def save_transcripts_to_files(api_key, video_id, output_dir):
             return
 
         proxies = {
-            "http": "socks5h://localhost:5173",
-            "https": "socks5h://localhost:5173"
+            'http': 'socks5://user:pass@host:port',
+            'https': 'socks5://user:pass@host:port'
         }
         # Get the transcript
         transcript = YouTubeTranscriptApi.get_transcript(video_id, proxies=proxies)
