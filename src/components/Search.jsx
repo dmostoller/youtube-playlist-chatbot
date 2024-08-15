@@ -30,7 +30,7 @@ function Search({ onSetVideoId}) {
           body: JSON.stringify(values),
         }).then((res) => {
             res.json().then((resData) => {
-            // console.log(resData)
+            console.log(resData)
             onSetVideoId(resData.result)
             formik.resetForm()
             setLoading(false)

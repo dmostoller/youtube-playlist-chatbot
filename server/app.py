@@ -6,8 +6,19 @@ import openai
 from youtube_transcript_api import YouTubeTranscriptApi, TranscriptsDisabled
 from googleapiclient.discovery import build
 import logging
+import http.client
+
+
+
 
 openai.api_key = os.getenv('OPENAI_API_KEY')
+rapid_api_key = os.getenv('RAPIDAPI_KEY')
+conn = http.client.HTTPSConnection("youtube-media-downloader.p.rapidapi.com")
+
+headers = {
+    'x-rapidapi-key': rapid_api_key,
+    'x-rapidapi-host': "youtube-media-downloader.p.rapidapi.com"
+}
 
 app = Flask(
     __name__,
@@ -34,12 +45,12 @@ def query_index():
             StorageContext,
             load_index_from_storage,
         )
-        # from llama_index.llms.openai import OpenAI
-        # llm = OpenAI(model="gpt-3.5-turbo")
+        from llama_index.llms.openai import OpenAI
+        llm = OpenAI(model="gpt-3.5-turbo")
 
-        # from llama_index.core.memory import ChatMemoryBuffer
+        from llama_index.core.memory import ChatMemoryBuffer
 
-        # memory = ChatMemoryBuffer.from_defaults(token_limit=3900)
+        memory = ChatMemoryBuffer.from_defaults(token_limit=3900)
 
 
         form_json = request.get_json()
@@ -65,20 +76,20 @@ def query_index():
             index = load_index_from_storage(storage_context)
 
 
-        # chat_engine = index.as_chat_engine(
-        #     chat_mode="condense_plus_context",
-        #     memory=memory,
-        #     llm=llm,
-        #     context_prompt=(
-        #         "You are a chatbot, able to have normal interactions, as well as talk"
-        #         " about the content of the context."
-        #         "Here are the relevant documents for the context:\n"
-        #         "{context_str}"
-        #         "\nInstruction: Use the previous chat history, or the context above, to interact and help the user."
-        #     ),
-        #     verbose=False,
-        # )
-        chat_engine = index.as_chat_engine(chat_mode="condense_question", verbose=True)
+        chat_engine = index.as_chat_engine(
+            chat_mode="condense_plus_context",
+            memory=memory,
+            llm=llm,
+            context_prompt=(
+                "You are a chatbot, able to have normal interactions, as well as talk"
+                " about the content of the context."
+                "Here are the relevant documents for the context:\n"
+                "{context_str}"
+                "\nInstruction: Use the previous chat history, or the context above, to interact and help the user."
+            ),
+            verbose=False,
+        )
+        # chat_engine = index.as_chat_engine(chat_mode="condense_question", verbose=True)
 
         response = chat_engine.chat(prompt)
 
@@ -134,6 +145,11 @@ def save_transcripts_to_files(api_key, video_id, output_dir):
     )
     response = request.execute()
 
+    conn.request("GET", f"/v2/video/details?videoId={video_id}", headers=headers)
+    res = conn.getresponse()
+    data = res.read()
+
+
     # Extract video details
     if not response["items"]:
         print(f"No video found with ID {video_id}")
@@ -154,7 +170,7 @@ def save_transcripts_to_files(api_key, video_id, output_dir):
             return
 
         # Get the transcript
-        transcript = YouTubeTranscriptApi.get_transcript(video_id, proxies={"https": "http://localhost:8080"})
+        transcript = YouTubeTranscriptApi.get_transcript(video_id, proxies={"https": "https://user:pass@domain:port"})
 
         with open(filename, "w") as file:
             # Write each transcript entry to the file
