@@ -6,7 +6,7 @@ import openai
 from youtube_transcript_api import YouTubeTranscriptApi, TranscriptsDisabled
 from googleapiclient.discovery import build
 import logging
-import http.client
+import requests
 
 
 
@@ -171,7 +171,7 @@ def save_transcripts_to_files(api_key, video_id, output_dir):
             return
 
         # Get the transcript
-        transcript = YouTubeTranscriptApi.get_transcript(video_id, proxies={"https": "https://user:pass@domain:port"})
+        transcript = YouTubeTranscriptApi.get_transcript(video_id, proxies={"https": "socks5h://localhost:8080"})
 
         with open(filename, "w") as file:
             # Write each transcript entry to the file
