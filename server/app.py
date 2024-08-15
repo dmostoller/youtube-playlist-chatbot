@@ -177,8 +177,8 @@ def save_transcripts_to_files(api_key, video_id, output_dir):
             return
 
         proxies = {
-            'http': 'socks5h://user:pass@host:port',
-            'https': 'socks5h://user:pass@host:port'
+            'http': 'socks5h://127.0.0.1:5000',
+            'https': 'socks5h://127.0.0.1:5000'
         }
         # Get the transcript
         transcript = YouTubeTranscriptApi.get_transcript(video_id, proxies=proxies)
